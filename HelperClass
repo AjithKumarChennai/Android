@@ -1,0 +1,115 @@
+public class HelperClass {
+
+    public static void setUserDate(Context context, RealmModel realmModel) {
+
+            RealmModel realmModelObject;
+
+            Realm.init(context);
+
+            Realm realm = Realm.getDefaultInstance();
+
+            if(!realm.isInTransaction())
+
+                realm.beginTransaction();
+
+            //For edit
+            if(realmModel.getPrimaryId() != 0) {
+
+                RealmModel model = new RealmModel();
+
+                model.setPrimaryId(realmModel.getPrimaryId());
+
+                model.setEmpId(realmModel.getEmpId());
+
+                model.setEmpName(realmModel.getEmpName());
+
+                realm.copyToRealmOrUpdate(model);
+
+                //For add
+            } else {
+
+                int primary = 0;
+
+                try {
+
+                    primary = realm.where(RealmModel.class)
+                            .max("primaryId")
+                            .intValue()+1;
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+
+                }
+
+                realmModelObject = realm.createObject(RealmModel.class, primary);
+
+                realmModelObject.setEmpId(realmModel.getEmpId());
+
+                realmModelObject.setEmpName(realmModel.getEmpName());
+
+            }
+
+            if(!realm.isClosed()) {
+
+                realm.commitTransaction();
+
+                realm.close();
+
+            }
+
+    }
+
+    public static List<RealmModel> getUserData(Context context) {
+
+        Realm.init(context);
+
+        Realm realm = Realm.getDefaultInstance();
+
+        List<RealmModel> showList = new ArrayList<>();
+
+        RealmResults<RealmModel> realmResults = realm.where(RealmModel.class)
+                .sort("primaryId")
+                .findAll();
+
+        showList.addAll(realm.copyFromRealm(realmResults));
+
+        return showList;
+
+    }
+
+    public static boolean deleteUserData (int primaryId, Context context) {
+
+        Realm.init(context);
+
+        Realm realm = Realm.getDefaultInstance();
+
+        RealmModel realmModel = realm.where(RealmModel.class).
+                equalTo("primaryId", primaryId)
+                .findFirst();
+
+        if(realmModel != null) {
+
+            if(!realm.isInTransaction())
+
+                realm.beginTransaction();
+
+            realmModel.deleteFromRealm();
+
+            if(!realm.isClosed()) {
+
+                realm.commitTransaction();
+
+                realm.close();
+
+            }
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+}
