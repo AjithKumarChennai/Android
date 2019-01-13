@@ -1,6 +1,6 @@
 getSpannableString("*Name", tv_name);
 
-
+---
 
 private void getSpannableString(String text, TextView view) {
 
