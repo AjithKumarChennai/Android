@@ -1,4 +1,4 @@
-Calendar current = Calendar.getInstance();
+            Calendar current = Calendar.getInstance();
 
             int currentDate = current.get(Calendar.DAY_OF_MONTH);
 
